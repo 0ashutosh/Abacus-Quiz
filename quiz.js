@@ -227,7 +227,7 @@ function handleAnswer(answer) {
 }
 
 function startQuestion() {
-    timeLeft = 3;
+    timeLeft = 6;
     currentQuestion = generateQuestion(currentLevel);
     updateQuizUI();
     timer = setInterval(() => {
