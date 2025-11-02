@@ -33,8 +33,6 @@ function initializeFloatingCalculators() {
     `;
     
     containers.forEach(container => {
-        // prevent DOM bloat on reinitialization
-        container.innerHTML = "";
         for (let i = 0; i < 15; i++) {
             const div = document.createElement('div');
             div.style.position = 'absolute';
@@ -86,13 +84,13 @@ function generateQuestion(level) {
             
         case level <= 4:
             if (Math.random() < 0.5) {
-                num1 = generateNumber(15, 60);
-                num2 = generateNumber(15, 60);
+                num1 = generateNumber(10, 50);
+                num2 = generateNumber(10, 50);
                 operation = '+';
                 answer = num1 + num2;
             } else {
-                num2 = generateNumber(10, 40);
-                num1 = generateNumber(num2 + 10, 70);
+                num2 = generateNumber(10, 30);
+                num1 = generateNumber(num2 + 10, 50);
                 operation = '-';
                 answer = num1 - num2;
             }
@@ -101,18 +99,18 @@ function generateQuestion(level) {
         case level <= 6:
             const op = Math.random();
             if (op < 0.25) {
-                num1 = generateNumber(20, 80);
-                num2 = generateNumber(20, 80);
+                num1 = generateNumber(10, 50);
+                num2 = generateNumber(10, 50);
                 operation = '+';
                 answer = num1 + num2;
             } else if (op < 0.5) {
-                num2 = generateNumber(15, 60);
-                num1 = generateNumber(num2 + 10, 90);
+                num2 = generateNumber(10, 30);
+                num1 = generateNumber(num2 + 10, 50);
                 operation = '-';
                 answer = num1 - num2;
             } else if (op < 0.75) {
-                num1 = generateNumber(5, 15);
-                num2 = generateNumber(3, 15);
+                num1 = generateNumber(2, 12);
+                num2 = generateNumber(2, 10);
                 operation = '×';
                 answer = num1 * num2;
             } else {
@@ -124,20 +122,9 @@ function generateQuestion(level) {
             break;
             
         default:
-            const hardOp = Math.random();
-            if (hardOp < 0.33) {
-                num1 = generateNumber(30, 120);
-                num2 = generateNumber(30, 120);
-                operation = '+';
-                answer = num1 + num2;
-            } else if (hardOp < 0.66) {
-                num2 = generateNumber(25, 100);
-                num1 = generateNumber(num2 + 20, 150);
-                operation = '-';
-                answer = num1 - num2;
-            } else if (hardOp < 0.85) {
-                num1 = generateNumber(10, 25);
-                num2 = generateNumber(5, 20);
+            if (Math.random() < 0.5) {
+                num1 = generateNumber(5, 20);
+                num2 = generateNumber(5, 15);
                 operation = '×';
                 answer = num1 * num2;
             } else {
@@ -240,7 +227,6 @@ function handleAnswer(answer) {
 }
 
 function startQuestion() {
-    clearInterval(timer); // prevent timer buildup
     timeLeft = 6;
     currentQuestion = generateQuestion(currentLevel);
     updateQuizUI();
@@ -251,19 +237,19 @@ function startQuestion() {
 }
 
 function startQuiz() {
-    clearInterval(totalTimer); // prevent totalTimer buildup
     questionNumber = 1;
     correctAnswers = 0;
     startTime = Date.now();
     showScreen('quiz');
     startQuestion();
+    
+    // Start total time counter
     totalTimer = setInterval(updateTotalTime, 1000);
 }
 
 // Initialize the quiz
 function initializeQuiz() {
     const levelGrid = document.querySelector('.level-grid');
-    levelGrid.innerHTML = ""; // prevent duplicate buttons
     for (let i = 0; i < 9; i++) {
         const button = document.createElement('button');
         button.className = 'btn-primary';
