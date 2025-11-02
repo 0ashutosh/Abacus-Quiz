@@ -49,102 +49,129 @@ function initializeFloatingCalculators() {
 }
 
 // Quiz logic
-function generateNumber(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
-function generateOptions(correctAnswer, min, max) {
-    const options = new Set([correctAnswer]);
-    while (options.size < 4) {
-        const wrong = correctAnswer + generateNumber(-5, 5);
-        if (wrong !== correctAnswer && wrong >= min && wrong <= max) {
-            options.add(wrong);
-        }
-    }
-    return Array.from(options).sort(() => Math.random() - 0.5);
-}
-
 function generateQuestion(level) {
     let num1, num2, operation, answer;
-    
-    switch (true) {
-        case level <= 1:
-            num1 = generateNumber(1, level === 0 ? 10 : 20);
-            num2 = generateNumber(1, level === 0 ? 10 : 20);
-            operation = '+';
-            answer = num1 + num2;
+
+    switch (level) {
+        case 1: // Level 1: single number add & subtract
+            num1 = generateNumber(1, 9);
+            num2 = generateNumber(1, 9);
+            operation = Math.random() < 0.5 ? '+' : '-';
+            if (operation === '-' && num2 > num1) [num1, num2] = [num2, num1];
+            answer = operation === '+' ? num1 + num2 : num1 - num2;
             break;
-            
-        case level <= 2:
-            num1 = generateNumber(10, 30);
-            num2 = generateNumber(10, 30);
-            operation = '+';
-            answer = num1 + num2;
+
+        case 2: // Level 2: double number add & subtract
+            num1 = generateNumber(10, 99);
+            num2 = generateNumber(10, 99);
+            operation = Math.random() < 0.5 ? '+' : '-';
+            if (operation === '-' && num2 > num1) [num1, num2] = [num2, num1];
+            answer = operation === '+' ? num1 + num2 : num1 - num2;
             break;
-            
-        case level <= 4:
-            if (Math.random() < 0.5) {
-                num1 = generateNumber(10, 50);
-                num2 = generateNumber(10, 50);
-                operation = '+';
+
+        case 3: // Level 3: triple number add & subtract
+            num1 = generateNumber(100, 999);
+            num2 = generateNumber(100, 999);
+            operation = Math.random() < 0.5 ? '+' : '-';
+            if (operation === '-' && num2 > num1) [num1, num2] = [num2, num1];
+            answer = operation === '+' ? num1 + num2 : num1 - num2;
+            break;
+
+        case 4: // Level 4: single/double number add, subtract, multiply
+            const ops4 = ['+', '-', '×'];
+            operation = ops4[Math.floor(Math.random() * ops4.length)];
+            num1 = generateNumber(1, Math.random() < 0.5 ? 9 : 99);
+            num2 = generateNumber(1, Math.random() < 0.5 ? 9 : 99);
+            if (operation === '-') {
+                if (num2 > num1) [num1, num2] = [num2, num1];
+                answer = num1 - num2;
+            } else if (operation === '+') {
                 answer = num1 + num2;
             } else {
-                num2 = generateNumber(10, 30);
-                num1 = generateNumber(num2 + 10, 50);
-                operation = '-';
-                answer = num1 - num2;
+                answer = num1 * num2;
             }
             break;
-            
-        case level <= 6:
-            const op = Math.random();
-            if (op < 0.25) {
-                num1 = generateNumber(10, 50);
-                num2 = generateNumber(10, 50);
-                operation = '+';
-                answer = num1 + num2;
-            } else if (op < 0.5) {
-                num2 = generateNumber(10, 30);
-                num1 = generateNumber(num2 + 10, 50);
-                operation = '-';
+
+        case 5: // Level 5: add, subtract, multiply with single/double number
+            const ops5 = ['+', '-', '×'];
+            operation = ops5[Math.floor(Math.random() * ops5.length)];
+            num1 = generateNumber(1, Math.random() < 0.5 ? 9 : 99);
+            num2 = generateNumber(1, Math.random() < 0.5 ? 9 : 99);
+            if (operation === '-') {
+                if (num2 > num1) [num1, num2] = [num2, num1];
                 answer = num1 - num2;
-            } else if (op < 0.75) {
-                num1 = generateNumber(2, 12);
-                num2 = generateNumber(2, 10);
-                operation = '×';
+            } else if (operation === '+') {
+                answer = num1 + num2;
+            } else {
+                answer = num1 * num2;
+            }
+            break;
+
+        case 6: // Level 6: add, subtract, multiply, divide single number
+            const ops6 = ['+', '-', '×', '÷'];
+            operation = ops6[Math.floor(Math.random() * ops6.length)];
+            num1 = generateNumber(1, 9);
+            num2 = generateNumber(1, 9);
+            if (operation === '-') {
+                if (num2 > num1) [num1, num2] = [num2, num1];
+                answer = num1 - num2;
+            } else if (operation === '+') {
+                answer = num1 + num2;
+            } else if (operation === '×') {
                 answer = num1 * num2;
             } else {
-                num2 = generateNumber(2, 10);
-                answer = generateNumber(2, 10);
+                answer = num1 * num2;
+                operation = '÷';
+                [num1, answer] = [answer, num2];
+            }
+            break;
+
+        case 7: // Level 7: add, subtract, multiply, divide double number
+            const ops7 = ['+', '-', '×', '÷'];
+            operation = ops7[Math.floor(Math.random() * ops7.length)];
+            num1 = generateNumber(10, 99);
+            num2 = generateNumber(10, 99);
+            if (operation === '-') {
+                if (num2 > num1) [num1, num2] = [num2, num1];
+                answer = num1 - num2;
+            } else if (operation === '+') {
+                answer = num1 + num2;
+            } else if (operation === '×') {
+                answer = num1 * num2;
+            } else {
+                num2 = generateNumber(2, 9);
+                answer = generateNumber(2, 9);
                 num1 = num2 * answer;
                 operation = '÷';
             }
             break;
-            
-        default:
-            if (Math.random() < 0.5) {
-                num1 = generateNumber(5, 20);
-                num2 = generateNumber(5, 15);
-                operation = '×';
+
+        case 8: // Level 8: any type of question
+            const allOps = ['+', '-', '×', '÷'];
+            operation = allOps[Math.floor(Math.random() * allOps.length)];
+            num1 = generateNumber(1, 999);
+            num2 = generateNumber(1, 999);
+            if (operation === '-') {
+                if (num2 > num1) [num1, num2] = [num2, num1];
+                answer = num1 - num2;
+            } else if (operation === '+') {
+                answer = num1 + num2;
+            } else if (operation === '×') {
+                num1 = generateNumber(2, 99);
+                num2 = generateNumber(2, 20);
                 answer = num1 * num2;
             } else {
                 num2 = generateNumber(2, 12);
                 answer = generateNumber(2, 12);
                 num1 = num2 * answer;
-                operation = '÷';
             }
+            break;
+
+        default:
+            num1 = 1; num2 = 1; operation = '+'; answer = 2;
     }
-    
-    let optionMin = Math.max(0, answer - 10);
-    let optionMax = answer + 10;
-    
-    if (operation === '×' || operation === '÷') {
-        optionMin = Math.max(0, answer - Math.max(num1, num2));
-        optionMax = answer + Math.max(num1, num2);
-    }
-    
-    const options = generateOptions(answer, optionMin, optionMax);
-    
+
+    const options = generateOptions(answer, Math.max(0, answer - 10), answer + 10);
     return { num1, num2, operation, answer, options };
 }
 
