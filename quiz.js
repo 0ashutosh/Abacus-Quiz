@@ -77,13 +77,12 @@ function generateQuestion(level) {
             answer = operation === '+' ? num1 + num2 : num1 - num2;
             break;
 
-        case 4: // Level 4: single/double number add, subtract, multiply
-            const ops4 = ['+', '-', '×'];
-            operation = ops4[Math.floor(Math.random() * ops4.length)];
+        case 4: // Level 4: single & double number add/subtract/multiply
+            operation = ['+', '-', '×'][Math.floor(Math.random() * 3)];
             num1 = generateNumber(1, Math.random() < 0.5 ? 9 : 99);
             num2 = generateNumber(1, Math.random() < 0.5 ? 9 : 99);
             if (operation === '-') {
-                if (num2 > num1) [num1, num2] = [num2, num1];
+                if (num2 > num1) [num1, num2] = [num1, num2].reverse();
                 answer = num1 - num2;
             } else if (operation === '+') {
                 answer = num1 + num2;
@@ -92,13 +91,12 @@ function generateQuestion(level) {
             }
             break;
 
-        case 5: // Level 5: add, subtract, multiply with single/double number
-            const ops5 = ['+', '-', '×'];
-            operation = ops5[Math.floor(Math.random() * ops5.length)];
+        case 5: // Level 5: add, subtract, multiply (single/double number)
+            operation = ['+', '-', '×'][Math.floor(Math.random() * 3)];
             num1 = generateNumber(1, Math.random() < 0.5 ? 9 : 99);
             num2 = generateNumber(1, Math.random() < 0.5 ? 9 : 99);
             if (operation === '-') {
-                if (num2 > num1) [num1, num2] = [num2, num1];
+                if (num2 > num1) [num1, num2] = [num1, num2].reverse();
                 answer = num1 - num2;
             } else if (operation === '+') {
                 answer = num1 + num2;
@@ -107,52 +105,48 @@ function generateQuestion(level) {
             }
             break;
 
-        case 6: // Level 6: add, subtract, multiply, divide single number
-            const ops6 = ['+', '-', '×', '÷'];
-            operation = ops6[Math.floor(Math.random() * ops6.length)];
+        case 6: // Level 6: add, subtract, multiply, divide (single number)
+            operation = ['+', '-', '×', '÷'][Math.floor(Math.random() * 4)];
             num1 = generateNumber(1, 9);
             num2 = generateNumber(1, 9);
             if (operation === '-') {
-                if (num2 > num1) [num1, num2] = [num2, num1];
+                if (num2 > num1) [num1, num2] = [num1, num2].reverse();
                 answer = num1 - num2;
             } else if (operation === '+') {
                 answer = num1 + num2;
             } else if (operation === '×') {
                 answer = num1 * num2;
             } else {
-                answer = num1 * num2;
-                operation = '÷';
-                [num1, answer] = [answer, num2];
+                answer = generateNumber(1, 9);
+                num2 = generateNumber(1, 9);
+                num1 = answer * num2;
             }
             break;
 
-        case 7: // Level 7: add, subtract, multiply, divide double number
-            const ops7 = ['+', '-', '×', '÷'];
-            operation = ops7[Math.floor(Math.random() * ops7.length)];
+        case 7: // Level 7: add, subtract, multiply, divide (double number)
+            operation = ['+', '-', '×', '÷'][Math.floor(Math.random() * 4)];
             num1 = generateNumber(10, 99);
             num2 = generateNumber(10, 99);
             if (operation === '-') {
-                if (num2 > num1) [num1, num2] = [num2, num1];
+                if (num2 > num1) [num1, num2] = [num1, num2].reverse();
                 answer = num1 - num2;
             } else if (operation === '+') {
                 answer = num1 + num2;
             } else if (operation === '×') {
                 answer = num1 * num2;
             } else {
-                num2 = generateNumber(2, 9);
-                answer = generateNumber(2, 9);
-                num1 = num2 * answer;
-                operation = '÷';
+                answer = generateNumber(2, 12);
+                num2 = generateNumber(2, 12);
+                num1 = answer * num2;
             }
             break;
 
         case 8: // Level 8: any type of question
-            const allOps = ['+', '-', '×', '÷'];
-            operation = allOps[Math.floor(Math.random() * allOps.length)];
+            operation = ['+', '-', '×', '÷'][Math.floor(Math.random() * 4)];
             num1 = generateNumber(1, 999);
             num2 = generateNumber(1, 999);
             if (operation === '-') {
-                if (num2 > num1) [num1, num2] = [num2, num1];
+                if (num2 > num1) [num1, num2] = [num1, num2].reverse();
                 answer = num1 - num2;
             } else if (operation === '+') {
                 answer = num1 + num2;
@@ -161,9 +155,9 @@ function generateQuestion(level) {
                 num2 = generateNumber(2, 20);
                 answer = num1 * num2;
             } else {
-                num2 = generateNumber(2, 12);
                 answer = generateNumber(2, 12);
-                num1 = num2 * answer;
+                num2 = generateNumber(2, 12);
+                num1 = answer * num2;
             }
             break;
 
