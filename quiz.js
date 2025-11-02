@@ -33,6 +33,8 @@ function initializeFloatingCalculators() {
     `;
     
     containers.forEach(container => {
+        // prevent DOM bloat on reinitialization
+        container.innerHTML = "";
         for (let i = 0; i < 15; i++) {
             const div = document.createElement('div');
             div.style.position = 'absolute';
@@ -64,121 +66,101 @@ function generateOptions(correctAnswer, min, max) {
     return Array.from(options).sort(() => Math.random() - 0.5);
 }
 
-// ✅ UPDATED DIFFICULTY LOGIC (scaling & floor division)
 function generateQuestion(level) {
     let num1, num2, operation, answer;
-
-    switch (level) {
-        case 1: // single number Add and subtract
-            num1 = generateNumber(1, 9);
-            num2 = generateNumber(1, 9);
-            operation = Math.random() < 0.5 ? '+' : '-';
-            answer = operation === '+' ? num1 + num2 : num1 - num2;
+    
+    switch (true) {
+        case level <= 1:
+            num1 = generateNumber(1, level === 0 ? 10 : 20);
+            num2 = generateNumber(1, level === 0 ? 10 : 20);
+            operation = '+';
+            answer = num1 + num2;
             break;
-
-        case 2: // double number Add and subtract
-            num1 = generateNumber(10, 99);
-            num2 = generateNumber(10, 99);
-            operation = Math.random() < 0.5 ? '+' : '-';
-            answer = operation === '+' ? num1 + num2 : num1 - num2;
+            
+        case level <= 2:
+            num1 = generateNumber(10, 30);
+            num2 = generateNumber(10, 30);
+            operation = '+';
+            answer = num1 + num2;
             break;
-
-        case 3: // triple number Add and subtract
-            num1 = generateNumber(100, 999);
-            num2 = generateNumber(100, 999);
-            operation = Math.random() < 0.5 ? '+' : '-';
-            answer = operation === '+' ? num1 + num2 : num1 - num2;
-            break;
-
-        case 4: // single & double add/subtract + multiply
-            const ops4 = ['+', '-', '×'];
-            operation = ops4[Math.floor(Math.random() * ops4.length)];
-            if (operation === '×') {
-                num1 = generateNumber(10, 50);
-                num2 = generateNumber(5, 20);
-                answer = num1 * num2;
+            
+        case level <= 4:
+            if (Math.random() < 0.5) {
+                num1 = generateNumber(15, 60);
+                num2 = generateNumber(15, 60);
+                operation = '+';
+                answer = num1 + num2;
             } else {
-                num1 = generateNumber(10, 99);
-                num2 = generateNumber(10, 99);
-                answer = operation === '+' ? num1 + num2 : num1 - num2;
+                num2 = generateNumber(10, 40);
+                num1 = generateNumber(num2 + 10, 70);
+                operation = '-';
+                answer = num1 - num2;
             }
             break;
-
-        case 5: // Add, subtraction, single number, double number, multiply
-            const ops5 = ['+', '-', '×'];
-            operation = ops5[Math.floor(Math.random() * ops5.length)];
-            if (operation === '×') {
+            
+        case level <= 6:
+            const op = Math.random();
+            if (op < 0.25) {
                 num1 = generateNumber(20, 80);
-                num2 = generateNumber(10, 30);
+                num2 = generateNumber(20, 80);
+                operation = '+';
+                answer = num1 + num2;
+            } else if (op < 0.5) {
+                num2 = generateNumber(15, 60);
+                num1 = generateNumber(num2 + 10, 90);
+                operation = '-';
+                answer = num1 - num2;
+            } else if (op < 0.75) {
+                num1 = generateNumber(5, 15);
+                num2 = generateNumber(3, 15);
+                operation = '×';
                 answer = num1 * num2;
             } else {
-                num1 = generateNumber(50, 200);
-                num2 = generateNumber(10, 150);
-                answer = operation === '+' ? num1 + num2 : num1 - num2;
+                num2 = generateNumber(2, 10);
+                answer = generateNumber(2, 10);
+                num1 = num2 * answer;
+                operation = '÷';
             }
             break;
-
-        case 6: // Add, subtraction, multiplication, division single number
-            const ops6 = ['+', '-', '×', '÷'];
-            operation = ops6[Math.floor(Math.random() * ops6.length)];
-            if (operation === '÷') {
-                num2 = generateNumber(2, 9);
-                num1 = generateNumber(num2, num2 * 9);
-                answer = Math.floor(num1 / num2);
-            } else if (operation === '×') {
-                num1 = generateNumber(5, 20);
-                num2 = generateNumber(5, 20);
-                answer = num1 * num2;
-            } else {
-                num1 = generateNumber(10, 99);
-                num2 = generateNumber(10, 99);
-                answer = operation === '+' ? num1 + num2 : num1 - num2;
-            }
-            break;
-
-        case 7: // Add, subtraction, multiplication, division double number
-            const ops7 = ['+', '-', '×', '÷'];
-            operation = ops7[Math.floor(Math.random() * ops7.length)];
-            if (operation === '÷') {
-                num2 = generateNumber(10, 99);
-                num1 = generateNumber(num2, num2 * 9);
-                answer = Math.floor(num1 / num2);
-            } else if (operation === '×') {
-                num1 = generateNumber(20, 99);
-                num2 = generateNumber(10, 50);
-                answer = num1 * num2;
-            } else {
-                num1 = generateNumber(100, 999);
-                num2 = generateNumber(50, 500);
-                answer = operation === '+' ? num1 + num2 : num1 - num2;
-            }
-            break;
-
-        case 8: // any type of question
+            
         default:
-            const ops8 = ['+', '-', '×', '÷'];
-            operation = ops8[Math.floor(Math.random() * ops8.length)];
-            if (operation === '÷') {
-                num2 = generateNumber(10, 99);
-                num1 = generateNumber(num2, num2 * 20);
-                answer = Math.floor(num1 / num2);
-            } else if (operation === '×') {
-                num1 = generateNumber(50, 999);
-                num2 = generateNumber(20, 200);
+            const hardOp = Math.random();
+            if (hardOp < 0.33) {
+                num1 = generateNumber(30, 120);
+                num2 = generateNumber(30, 120);
+                operation = '+';
+                answer = num1 + num2;
+            } else if (hardOp < 0.66) {
+                num2 = generateNumber(25, 100);
+                num1 = generateNumber(num2 + 20, 150);
+                operation = '-';
+                answer = num1 - num2;
+            } else if (hardOp < 0.85) {
+                num1 = generateNumber(10, 25);
+                num2 = generateNumber(5, 20);
+                operation = '×';
                 answer = num1 * num2;
             } else {
-                num1 = generateNumber(500, 5000);
-                num2 = generateNumber(100, 2000);
-                answer = operation === '+' ? num1 + num2 : num1 - num2;
+                num2 = generateNumber(2, 12);
+                answer = generateNumber(2, 12);
+                num1 = num2 * answer;
+                operation = '÷';
             }
-            break;
     }
-
-    const options = generateOptions(answer, Math.max(0, answer - 10), answer + 10);
+    
+    let optionMin = Math.max(0, answer - 10);
+    let optionMax = answer + 10;
+    
+    if (operation === '×' || operation === '÷') {
+        optionMin = Math.max(0, answer - Math.max(num1, num2));
+        optionMax = answer + Math.max(num1, num2);
+    }
+    
+    const options = generateOptions(answer, optionMin, optionMax);
+    
     return { num1, num2, operation, answer, options };
 }
 
-// Rest of your original code (unchanged)
 function updateTotalTime() {
     const totalSeconds = Math.floor((Date.now() - startTime) / 1000);
     const minutes = Math.floor(totalSeconds / 60);
@@ -187,6 +169,7 @@ function updateTotalTime() {
         `${minutes}:${seconds.toString().padStart(2, '0')}`;
 }
 
+// UI Updates
 function showScreen(screenId) {
     Object.values(screens).forEach(screen => screen.classList.add('hidden'));
     screens[screenId].classList.remove('hidden');
@@ -235,6 +218,7 @@ function showResults() {
     showScreen('results');
 }
 
+// Event Handlers
 function handleLevelSelect(level) {
     currentLevel = level;
     document.getElementById('selected-level').textContent = level;
@@ -256,6 +240,7 @@ function handleAnswer(answer) {
 }
 
 function startQuestion() {
+    clearInterval(timer); // prevent timer buildup
     timeLeft = 6;
     currentQuestion = generateQuestion(currentLevel);
     updateQuizUI();
@@ -266,6 +251,7 @@ function startQuestion() {
 }
 
 function startQuiz() {
+    clearInterval(totalTimer); // prevent totalTimer buildup
     questionNumber = 1;
     correctAnswers = 0;
     startTime = Date.now();
@@ -274,9 +260,11 @@ function startQuiz() {
     totalTimer = setInterval(updateTotalTime, 1000);
 }
 
+// Initialize the quiz
 function initializeQuiz() {
     const levelGrid = document.querySelector('.level-grid');
-    for (let i = 1; i <= 8; i++) {
+    levelGrid.innerHTML = ""; // prevent duplicate buttons
+    for (let i = 0; i < 9; i++) {
         const button = document.createElement('button');
         button.className = 'btn-primary';
         button.textContent = `Level ${i}`;
@@ -285,9 +273,15 @@ function initializeQuiz() {
     }
     
     document.getElementById('start-quiz').onclick = startQuiz;
-    document.getElementById('retry').onclick = () => showScreen('quizStart');
-    document.getElementById('home').onclick = () => showScreen('levelSelect');
+    document.getElementById('retry').onclick = () => {
+        showScreen('quizStart');
+    };
+    document.getElementById('home').onclick = () => {
+        showScreen('levelSelect');
+    };
+    
     initializeFloatingCalculators();
 }
 
+// Start the application
 initializeQuiz();
