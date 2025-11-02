@@ -31,8 +31,9 @@ function initializeFloatingCalculators() {
             <line x1="8" x2="8" y1="10" y2="10" />
         </svg>
     `;
-    
+
     containers.forEach(container => {
+        container.innerHTML = "";
         for (let i = 0; i < 15; i++) {
             const div = document.createElement('div');
             div.style.position = 'absolute';
@@ -66,7 +67,7 @@ function generateOptions(correctAnswer, min, max) {
 
 function generateQuestion(level) {
     let num1, num2, operation, answer;
-    
+
     switch (true) {
         case level <= 1:
             num1 = generateNumber(1, level === 0 ? 10 : 20);
@@ -74,41 +75,51 @@ function generateQuestion(level) {
             operation = '+';
             answer = num1 + num2;
             break;
-            
+
         case level <= 2:
             num1 = generateNumber(10, 30);
             num2 = generateNumber(10, 30);
             operation = '+';
             answer = num1 + num2;
             break;
-            
+
         case level <= 4:
             if (Math.random() < 0.5) {
+                num1 = generateNumber(15, 60);
+                num2 = generateNumber(15, 60);
                 num1 = generateNumber(10, 50);
                 num2 = generateNumber(10, 50);
                 operation = '+';
                 answer = num1 + num2;
             } else {
+                num2 = generateNumber(10, 40);
+                num1 = generateNumber(num2 + 10, 70);
                 num2 = generateNumber(10, 30);
                 num1 = generateNumber(num2 + 10, 50);
                 operation = '-';
                 answer = num1 - num2;
             }
             break;
-            
+
         case level <= 6:
             const op = Math.random();
             if (op < 0.25) {
+                num1 = generateNumber(20, 80);
+                num2 = generateNumber(20, 80);
                 num1 = generateNumber(10, 50);
                 num2 = generateNumber(10, 50);
                 operation = '+';
                 answer = num1 + num2;
             } else if (op < 0.5) {
+                num2 = generateNumber(15, 60);
+                num1 = generateNumber(num2 + 10, 90);
                 num2 = generateNumber(10, 30);
                 num1 = generateNumber(num2 + 10, 50);
                 operation = '-';
                 answer = num1 - num2;
             } else if (op < 0.75) {
+                num1 = generateNumber(5, 15);
+                num2 = generateNumber(3, 15);
                 num1 = generateNumber(2, 12);
                 num2 = generateNumber(2, 10);
                 operation = '×';
@@ -120,31 +131,45 @@ function generateQuestion(level) {
                 operation = '÷';
             }
             break;
-            
+
         default:
-            if (Math.random() < 0.5) {
-                num1 = generateNumber(5, 20);
-                num2 = generateNumber(5, 15);
-                operation = '×';
-                answer = num1 * num2;
+            const hardOp = Math.random();
+            if (hardOp < 0.33) {
+                num1 = generateNumber(30, 120);
+                num2 = generateNumber(30, 120);
+                operation = '+';
+                answer = num1 + num2;
+            } else if (hardOp < 0.66) {
+                num2 = generateNumber(25, 100);
+                num1 = generateNumber(num2 + 20, 150);
+                operation = '-';
+                answer = num1 - num2;
             } else {
-                num2 = generateNumber(2, 12);
-                answer = generateNumber(2, 12);
-                num1 = num2 * answer;
-                operation = '÷';
+                if (Math.random() < 0.5) {
+                    num1 = generateNumber(5, 20);
+                    num2 = generateNumber(5, 15);
+                    operation = '×';
+                    answer = num1 * num2;
+                } else {
+                    num2 = generateNumber(2, 12);
+                    answer = generateNumber(2, 12);
+                    num1 = num2 * answer;
+                    operation = '÷';
+                }
             }
+            break;
     }
-    
+
     let optionMin = Math.max(0, answer - 10);
     let optionMax = answer + 10;
-    
+
     if (operation === '×' || operation === '÷') {
         optionMin = Math.max(0, answer - Math.max(num1, num2));
         optionMax = answer + Math.max(num1, num2);
     }
-    
+
     const options = generateOptions(answer, optionMin, optionMax);
-    
+
     return { num1, num2, operation, answer, options };
 }
 
@@ -152,7 +177,7 @@ function updateTotalTime() {
     const totalSeconds = Math.floor((Date.now() - startTime) / 1000);
     const minutes = Math.floor(totalSeconds / 60);
     const seconds = totalSeconds % 60;
-    document.getElementById('total-time').textContent = 
+    document.getElementById('total-time').textContent =
         `${minutes}:${seconds.toString().padStart(2, '0')}`;
 }
 
@@ -168,7 +193,7 @@ function updateQuizUI() {
     document.getElementById('num2').textContent = currentQuestion.num2;
     document.getElementById('question-number').textContent = questionNumber;
     document.getElementById('current-level').textContent = currentLevel;
-    
+
     const optionsContainer = document.querySelector('.options');
     optionsContainer.innerHTML = '';
     currentQuestion.options.forEach(option => {
@@ -190,18 +215,18 @@ function updateTimer() {
 function showResults() {
     clearInterval(timer);
     clearInterval(totalTimer);
-    
+
     const timeTaken = Math.floor((Date.now() - startTime) / 1000);
     const minutes = Math.floor(timeTaken / 60);
     const seconds = timeTaken % 60;
     const percentage = (correctAnswers / 100) * 100;
-    
+
     document.getElementById('result-level').textContent = currentLevel;
     document.getElementById('retry-level').textContent = currentLevel;
     document.getElementById('correct-answers').textContent = correctAnswers;
     document.getElementById('percentage').textContent = percentage.toFixed(1);
     document.getElementById('time-taken').textContent = `${minutes}m ${seconds}s`;
-    
+
     showScreen('results');
 }
 
@@ -217,7 +242,7 @@ function handleAnswer(answer) {
     if (answer === currentQuestion.answer) {
         correctAnswers++;
     }
-    
+
     if (questionNumber < 100) {
         questionNumber++;
         startQuestion();
@@ -227,6 +252,7 @@ function handleAnswer(answer) {
 }
 
 function startQuestion() {
+    clearInterval(timer);
     timeLeft = 6;
     currentQuestion = generateQuestion(currentLevel);
     updateQuizUI();
@@ -237,19 +263,20 @@ function startQuestion() {
 }
 
 function startQuiz() {
+    clearInterval(totalTimer);
     questionNumber = 1;
     correctAnswers = 0;
     startTime = Date.now();
     showScreen('quiz');
     startQuestion();
-    
-    // Start total time counter
+
     totalTimer = setInterval(updateTotalTime, 1000);
 }
 
 // Initialize the quiz
 function initializeQuiz() {
     const levelGrid = document.querySelector('.level-grid');
+    levelGrid.innerHTML = "";
     for (let i = 0; i < 9; i++) {
         const button = document.createElement('button');
         button.className = 'btn-primary';
@@ -257,7 +284,7 @@ function initializeQuiz() {
         button.onclick = () => handleLevelSelect(i);
         levelGrid.appendChild(button);
     }
-    
+
     document.getElementById('start-quiz').onclick = startQuiz;
     document.getElementById('retry').onclick = () => {
         showScreen('quizStart');
@@ -265,7 +292,7 @@ function initializeQuiz() {
     document.getElementById('home').onclick = () => {
         showScreen('levelSelect');
     };
-    
+
     initializeFloatingCalculators();
 }
 
